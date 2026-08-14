@@ -1,0 +1,13 @@
+CHECK:      OpCapability Shader
+CHECK:      OpMemoryModel Logical GLSL450
+CHECK:      OpEntryPoint Fragment
+CHECK:      OpExecutionMode
+CHECK-DAG:  OpDecorate {{.*}} Location
+CHECK-DAG:  OpDecorate {{.*}} Binding
+CHECK-DAG:  OpDecorate {{.*}} DescriptorSet
+CHECK-DAG:  OpVariable {{.*}} UniformConstant
+CHECK-DAG:  OpVariable {{.*}} Input
+CHECK-DAG:  OpVariable {{.*}} Output
+CHECK-DAG:  OpVariable {{.*}} PushConstant
+CHECK:      OpFunction
+CHECK:      OpFunctionEnd

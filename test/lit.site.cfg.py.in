@@ -1,0 +1,5 @@
+import os
+
+config.shader_mlir_tools_dir = "@CMAKE_BINARY_DIR@/tools/shader-opt"
+
+lit_config.load_config(config, "@CMAKE_CURRENT_SOURCE_DIR@/lit.cfg.py")

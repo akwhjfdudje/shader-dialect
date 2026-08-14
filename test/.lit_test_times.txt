@@ -1,0 +1,12 @@
+5.435014e-02 Dialect/Shader/basic.mlir
+5.634832e-02 Dialect/Shader/cse.mlir
+6.348681e-02 Dialect/Shader/dead_resource_pruning.mlir
+6.422257e-02 Dialect/Shader/neural_pbr_material_pipeline.mlir
+5.730772e-02 Dialect/Shader/pbr_material_library_pipeline.mlir
+6.973410e-02 Dialect/Shader/pbr_material_library_verifier_errors.mlir
+5.332875e-02 Dialect/Shader/proxy_backend_lowering.mlir
+6.368613e-02 Dialect/Shader/resource_summary.mlir
+5.909657e-02 Dialect/Shader/spirv_lowering.mlir
+5.501604e-02 Dialect/Shader/spirv_pipeline.mlir
+5.727553e-02 Dialect/Shader/divergence_analysis.mlir
+7.161999e-02 Dialect/Shader/hoist_divergent_samples.mlir

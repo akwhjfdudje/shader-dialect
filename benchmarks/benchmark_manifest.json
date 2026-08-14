@@ -1,0 +1,383 @@
+{
+  "benchmarks": [
+    {
+      "name": "packed_material_parse_print",
+      "description": "No-op parse/print baseline for a fixed material example.",
+      "input": "examples/mlir/packed_material.mlir",
+      "pipeline": []
+    },
+    {
+      "name": "packed_material_cse",
+      "description": "Reusable packed texture samples should collapse under stock CSE.",
+      "input": "examples/mlir/packed_material.mlir",
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "derivative_sensitive_cse",
+      "description": "Ordinary derivative-sensitive samples should remain separate under CSE.",
+      "input": "examples/mlir/derivative_sensitive_sampling.mlir",
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "neural_material_cse",
+      "description": "Reusable feature texture samples should collapse in a shader/math mixed path.",
+      "input": "examples/mlir/neural_material_decode.mlir",
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "material_variant_summary",
+      "description": "Resource summary distinguishes full and simple material variants.",
+      "input": "examples/mlir/material_variants.mlir",
+      "pipeline": ["--shader-resource-summary"]
+    },
+    {
+      "name": "dead_resource_pruning",
+      "description": "Unused texture resource arguments are pruned from a specialized shader interface.",
+      "input": "test/Dialect/Shader/dead_resource_pruning.mlir",
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "prune_then_summary",
+      "description": "Prune unused resource arguments, then report the remaining live resource use.",
+      "input": "test/Dialect/Shader/dead_resource_pruning.mlir",
+      "pipeline": ["--shader-prune-dead-resources", "--shader-resource-summary"]
+    },
+    {
+      "name": "generated_reusable_32_parse_print",
+      "description": "No-op baseline for generated duplicate reusable samples.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 32, "channels": 4},
+      "pipeline": []
+    },
+    {
+      "name": "generated_reusable_32_cse",
+      "description": "CSE scalability for many duplicate reusable samples.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 32, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "generated_reusable_32_proxy_backend",
+      "description": "Proxy backend cost after CSE collapses duplicate reusable samples.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 32, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend"]
+    },
+    {
+      "name": "generated_ordinary_32_cse",
+      "description": "CSE should preserve many ordinary derivative-sensitive samples.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 32},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "generated_ordinary_32_proxy_backend",
+      "description": "Proxy backend cost keeps ordinary derivative-sensitive samples separate.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 32},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend"]
+    },
+    {
+      "name": "generated_dead_resources_32_prune",
+      "description": "Dead resource pruning scalability for unused texture arguments.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 32},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "generated_dead_resources_32_proxy_backend",
+      "description": "Proxy backend cost after dead resource pruning shrinks the interface.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 32},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend"]
+    },
+    {
+      "name": "generated_call_chain_8_prune",
+      "description": "Pruning direct call operands through a generated call chain.",
+      "generator": "call_chain_dead_resources",
+      "params": {"functions": 8, "dead_textures": 4},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "generated_variants_16_summary",
+      "description": "Resource summary scalability across many material variants.",
+      "generator": "mixed_material_variants",
+      "params": {"variants": 16, "max_textures": 6},
+      "pipeline": ["--shader-resource-summary"]
+    },
+    {
+      "name": "generated_combined_pipeline",
+      "description": "Combined CSE, pruning, and summary pipeline on generated dead resource input.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 4, "dead_textures": 16},
+      "pipeline": ["--cse", "--shader-prune-dead-resources", "--shader-resource-summary"]
+    },
+    {
+      "name": "generated_combined_proxy_backend",
+      "description": "Combined semantic analysis and proxy backend lowering on generated dead resource input.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 4, "dead_textures": 16},
+      "pipeline": ["--cse", "--shader-prune-dead-resources", "--shader-resource-summary", "--shader-lower-to-proxy-backend"]
+    },
+
+    {
+      "name": "reusable_cse_scale_8",
+      "description": "CSE scaling: 8 reusable samples -> linear elimination.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 8, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "reusable_cse_scale_16",
+      "description": "CSE scaling: 16 reusable samples -> linear elimination.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 16, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "reusable_cse_scale_64",
+      "description": "CSE scaling: 64 reusable samples -> linear elimination.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 64, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "reusable_cse_scale_128",
+      "description": "CSE scaling: 128 reusable samples -> linear elimination.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 128, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "reusable_cse_scale_256",
+      "description": "CSE scaling: 256 reusable samples -> linear elimination.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 256, "channels": 4},
+      "pipeline": ["--cse"]
+    },
+
+    {
+      "name": "ordinary_cse_scale_8",
+      "description": "CSE preserves ordinary samples: 8 -> 0 eliminated.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 8},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "ordinary_cse_scale_16",
+      "description": "CSE preserves ordinary samples: 16 -> 0 eliminated.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 16},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "ordinary_cse_scale_64",
+      "description": "CSE preserves ordinary samples: 64 -> 0 eliminated.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 64},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "ordinary_cse_scale_128",
+      "description": "CSE preserves ordinary samples: 128 -> 0 eliminated.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 128},
+      "pipeline": ["--cse"]
+    },
+    {
+      "name": "ordinary_cse_scale_256",
+      "description": "CSE preserves ordinary samples: 256 -> 0 eliminated.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 256},
+      "pipeline": ["--cse"]
+    },
+
+    {
+      "name": "prune_scale_8",
+      "description": "Pruning scaling: 8 dead resources eliminated.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 8},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "prune_scale_16",
+      "description": "Pruning scaling: 16 dead resources eliminated.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 16},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "prune_scale_64",
+      "description": "Pruning scaling: 64 dead resources eliminated.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 64},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "prune_scale_128",
+      "description": "Pruning scaling: 128 dead resources eliminated.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 128},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+    {
+      "name": "prune_scale_256",
+      "description": "Pruning scaling: 256 dead resources eliminated.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 256},
+      "pipeline": ["--shader-prune-dead-resources"]
+    },
+
+    {
+      "name": "variants_scale_8",
+      "description": "Summary scaling: 8 material variants.",
+      "generator": "mixed_material_variants",
+      "params": {"variants": 8, "max_textures": 6},
+      "pipeline": ["--shader-resource-summary"]
+    },
+    {
+      "name": "variants_scale_32",
+      "description": "Summary scaling: 32 material variants.",
+      "generator": "mixed_material_variants",
+      "params": {"variants": 32, "max_textures": 6},
+      "pipeline": ["--shader-resource-summary"]
+    },
+    {
+      "name": "variants_scale_64",
+      "description": "Summary scaling: 64 material variants.",
+      "generator": "mixed_material_variants",
+      "params": {"variants": 64, "max_textures": 6},
+      "pipeline": ["--shader-resource-summary"]
+    },
+
+    {
+      "name": "spirv_lowering_reusable",
+      "description": "SPIR-V lowering after CSE on reusable samples: shader -> spirv dialect.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 32, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_lowering_ordinary",
+      "description": "SPIR-V lowering on ordinary samples: all samples survive, measure spirv op count.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 32},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_lowering_dead_prune",
+      "description": "SPIR-V lowering after pruning: dead resources gone before spirv conversion.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 32},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+
+    {
+      "name": "spirv_reusable_scale_8",
+      "description": "SPIR-V lowering scaling: 8 reusable samples -> 2 SPIR-V ops.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 8, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_reusable_scale_16",
+      "description": "SPIR-V lowering scaling: 16 reusable samples -> 2 SPIR-V ops.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 16, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_reusable_scale_64",
+      "description": "SPIR-V lowering scaling: 64 reusable samples -> 2 SPIR-V ops.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 64, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_reusable_scale_128",
+      "description": "SPIR-V lowering scaling: 128 reusable samples -> 2 SPIR-V ops.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 128, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_reusable_scale_256",
+      "description": "SPIR-V lowering scaling: 256 reusable samples -> 2 SPIR-V ops.",
+      "generator": "duplicate_reusable_samples",
+      "params": {"samples": 256, "channels": 4},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+
+    {
+      "name": "spirv_ordinary_scale_8",
+      "description": "SPIR-V lowering scaling: 8 ordinary samples -> 16 SPIR-V ops.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 8},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_ordinary_scale_16",
+      "description": "SPIR-V lowering scaling: 16 ordinary samples -> 32 SPIR-V ops.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 16},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_ordinary_scale_64",
+      "description": "SPIR-V lowering scaling: 64 ordinary samples -> 128 SPIR-V ops.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 64},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_ordinary_scale_128",
+      "description": "SPIR-V lowering scaling: 128 ordinary samples -> 256 SPIR-V ops.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 128},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_ordinary_scale_256",
+      "description": "SPIR-V lowering scaling: 256 ordinary samples -> 512 SPIR-V ops.",
+      "generator": "ordinary_derivative_samples",
+      "params": {"samples": 256},
+      "pipeline": ["--cse", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+
+    {
+      "name": "spirv_prune_scale_8",
+      "description": "SPIR-V lowering after pruning: 8 dead resources.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 8},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_prune_scale_16",
+      "description": "SPIR-V lowering after pruning: 16 dead resources.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 16},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_prune_scale_64",
+      "description": "SPIR-V lowering after pruning: 64 dead resources.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 64},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_prune_scale_128",
+      "description": "SPIR-V lowering after pruning: 128 dead resources.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 128},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    },
+    {
+      "name": "spirv_prune_scale_256",
+      "description": "SPIR-V lowering after pruning: 256 dead resources.",
+      "generator": "dead_resource_args",
+      "params": {"live_textures": 2, "dead_textures": 256},
+      "pipeline": ["--shader-prune-dead-resources", "--shader-lower-to-proxy-backend", "--shader-to-spirv"]
+    }
+  ]
+}

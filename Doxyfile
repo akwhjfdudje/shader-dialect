@@ -1,0 +1,33 @@
+# Doxyfile 1.9.1
+
+PROJECT_NAME           = "Shader Semantics MLIR Dialect"
+PROJECT_BRIEF          = "An MLIR dialect for shader-specific semantics and optimizations"
+OUTPUT_DIRECTORY       = docs/doxygen
+
+INPUT                  = README.md \
+                         lib \
+                         include \
+                         tools \
+                         examples
+
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+
+GENERATE_LATEX         = NO
+GENERATE_HTML          = YES
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+
+FILE_PATTERNS          = *.cpp \
+                         *.h \
+                         *.inc \
+                         *.td \
+                         *.py \
+                         *.md \
+                         *.mlir
+
+SOURCE_BROWSER         = YES
+ALPHABETICAL_INDEX     = YES
+OPTIMIZE_OUTPUT_FOR_C  = NO
